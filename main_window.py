@@ -1,3 +1,4 @@
+from pathlib import Path
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -83,6 +84,14 @@ class ThemeToggle(QCheckBox):
             18,
             "☀" if not self.isChecked() else "☾",
         )
+        
+    def toggle_theme(self, dark: bool):
+        """Переключает тему интерфейса."""
+
+        if dark:
+            self.load_style("dark.qss")
+        else:
+            self.load_style("light.qss")
 
 class MainWindow(QMainWindow):
     """Главное окно игры «Угадай число»."""
@@ -101,6 +110,8 @@ class MainWindow(QMainWindow):
 
         self.create_interface()
         self.apply_styles()
+        self.create_interface()
+        self.load_style("light.qss")
 
     def create_interface(self):
         """Создаёт интерфейс главного окна."""
@@ -367,145 +378,20 @@ class MainWindow(QMainWindow):
             bottom_layout
         )
 
-    def apply_styles(self):
-        """Настраивает внешний вид приложения."""
+    def load_style(self, filename: str):
+        """Загружает стиль интерфейса из QSS-файла."""
 
-        self.setStyleSheet(
-            """
-            QMainWindow {
-                background-color: #f7f8fa;
-            }
-
-            QWidget {
-                font-family: "Segoe UI";
-                font-size: 13px;
-                color: #263238;
-            }
-
-            /* -------------------------------
-               Кнопки категорий
-               ------------------------------- */
-
-            QPushButton {
-                background-color: #ffffff;
-                border: 1px solid #d9dde3;
-                border-radius: 6px;
-                padding: 5px 12px;
-                color: #374151;
-            }
-
-            QPushButton:hover {
-                background-color: #f0f3f6;
-            }
-
-            QPushButton:pressed {
-                background-color: #e7ebef;
-            }
-
-            QPushButton#activeCategory {
-                background-color: #e2e5e9;
-                border: 1px solid #d0d5db;
-                color: #1f2933;
-                font-weight: 600;
-            }
-
-            /* -------------------------------
-               Основная область таблицы
-               ------------------------------- */
-
-            QFrame#tableFrame {
-                background-color: #ffffff;
-                border: 1px solid #e1e5e9;
-                border-radius: 7px;
-            }
-
-            /* -------------------------------
-               Чекбоксы
-               ------------------------------- */
-
-            QCheckBox#columnCheckBox {
-                spacing: 7px;
-                padding: 4px;
-                color: #4b5563;
-            }
-
-            QCheckBox#columnCheckBox::indicator {
-                width: 15px;
-                height: 15px;
-                border: 1px solid #bfc5cc;
-                border-radius: 3px;
-                background-color: #ffffff;
-            }
-
-            QCheckBox#columnCheckBox::indicator:hover {
-                border: 1px solid #9aa3ad;
-            }
-
-            QCheckBox#columnCheckBox::indicator:checked {
-                background-color: #e0e4e8;
-                border: 1px solid #8e98a3;
-            }
-
-            /* -------------------------------
-               Таблица
-               ------------------------------- */
-
-            QTableWidget#numberTable {
-                background-color: #ffffff;
-                border: none;
-                gridline-color: #e3e6e9;
-                color: #343a40;
-                font-size: 13px;
-            }
-
-            QTableWidget#numberTable::item {
-                padding: 3px;
-                border: none;
-            }
-
-            QTableWidget#numberTable::item:selected {
-                background-color: #ffffff;
-                color: #343a40;
-            }
-
-            /* -------------------------------
-               Результат
-               ------------------------------- */
-
-            QFrame#resultFrame {
-                background-color: #ffffff;
-                border: 1px solid #e0e4e8;
-                border-radius: 7px;
-            }
-
-            QLabel#resultLabel {
-                color: #183b56;
-                font-size: 17px;
-                font-weight: 600;
-            }
-
-            /* -------------------------------
-               Основная кнопка
-               ------------------------------- */
-
-            QPushButton#actionButton {
-                background-color: #d7dadd;
-                border: 1px solid #c8ccd0;
-                border-radius: 6px;
-                color: #263238;
-                font-weight: 600;
-                padding: 7px 15px;
-            }
-
-            QPushButton#actionButton:hover {
-                background-color: #cdd1d5;
-            }
-
-            QPushButton#actionButton:pressed {
-                background-color: #c1c5c9;
-            }
-            """
+        style_path = (
+            Path(__file__).resolve().parent
+            / "styles"
+            / filename
         )
+
+        with style_path.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
+            self.setStyleSheet(file.read())
 
     def toggle_theme(self, dark: bool):
         """Переключает светлую и тёмную тему."""

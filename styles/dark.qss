@@ -1,0 +1,108 @@
+QMainWindow {
+    background-color: #1e2329;
+}
+
+QWidget {
+    font-family: "Segoe UI";
+    font-size: 13px;
+    color: #e6e9ed;
+}
+
+QPushButton {
+    background-color: #2b3138;
+    border: 1px solid #3b444e;
+    border-radius: 6px;
+    padding: 5px 12px;
+    color: #e6e9ed;
+}
+
+QPushButton:hover {
+    background-color: #343c45;
+}
+
+QPushButton:pressed {
+    background-color: #3d4650;
+}
+
+QPushButton#activeCategory {
+    background-color: #3a424c;
+    border: 1px solid #4b5662;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+QFrame#tableFrame {
+    background-color: #252b32;
+    border: 1px solid #3b444e;
+    border-radius: 7px;
+}
+
+QCheckBox#columnCheckBox {
+    spacing: 7px;
+    padding: 4px;
+    color: #cbd1d8;
+}
+
+QCheckBox#columnCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #59636e;
+    border-radius: 3px;
+    background-color: #252b32;
+}
+
+QCheckBox#columnCheckBox::indicator:hover {
+    border: 1px solid #74808c;
+}
+
+QCheckBox#columnCheckBox::indicator:checked {
+    background-color: #59636e;
+    border: 1px solid #7b8793;
+}
+
+QTableWidget#numberTable {
+    background-color: #252b32;
+    border: none;
+    gridline-color: #3b444e;
+    color: #e1e5e9;
+    font-size: 13px;
+}
+
+QTableWidget#numberTable::item {
+    padding: 3px;
+    border: none;
+}
+
+QTableWidget#numberTable::item:selected {
+    background-color: #252b32;
+    color: #e1e5e9;
+}
+
+QFrame#resultFrame {
+    background-color: #252b32;
+    border: 1px solid #3b444e;
+    border-radius: 7px;
+}
+
+QLabel#resultLabel {
+    color: #dce3ea;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+QPushButton#actionButton {
+    background-color: #3a424b;
+    border: 1px solid #4a5561;
+    border-radius: 6px;
+    color: #edf0f3;
+    font-weight: 600;
+    padding: 7px 15px;
+}
+
+QPushButton#actionButton:hover {
+    background-color: #444e59;
+}
+
+QPushButton#actionButton:pressed {
+    background-color: #4d5864;
+}
