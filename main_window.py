@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
 from game import Game
 
 class ThemeToggle(QCheckBox):
-    """Кастомный переключатель светлой и тёмной темы."""
+    """Переключатель светлой и тёмной темы."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -26,6 +26,21 @@ class ThemeToggle(QCheckBox):
         self.setFixedSize(54, 28)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip("Переключить тему")
+        self.setChecked(False)
+
+    def mouseReleaseEvent(self, event):
+        """Переключает состояние при нажатии мышью."""
+
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.setChecked(not self.isChecked())
+            self.update()
+
+            # Не передаём событие QCheckBox,
+            # чтобы состояние не переключилось второй раз.
+            event.accept()
+            return
+
+        super().mouseReleaseEvent(event)
 
     def paintEvent(self, event):
         """Отрисовывает переключатель."""
@@ -55,7 +70,7 @@ class ThemeToggle(QCheckBox):
             14,
         )
 
-        # Положение круглого переключателя
+        # Положение кружка
         if self.isChecked():
             circle_x = 29
             circle_color = QColor("#f4f6f8")
@@ -72,7 +87,7 @@ class ThemeToggle(QCheckBox):
             22,
         )
 
-        # Символ темы
+        # Значок темы
         painter.setPen(
             QColor("#66717d")
             if not self.isChecked()
