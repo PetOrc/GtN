@@ -15,11 +15,37 @@ class Game:
 
     def get_categories(self) -> list[Category]:
         """Возвращает список доступных категорий."""
+
         return self.data_repository.get_categories()
 
     def get_category(self, identifier: str) -> Category | None:
         """Возвращает категорию по идентификатору."""
+
         return self.data_repository.get_category(identifier)
+
+    def calculate_number(
+        self,
+        selected_columns: list[str],
+    ) -> int:
+        """Вычисляет загаданное число."""
+
+        if not selected_columns:
+            raise ValueError(
+                "Не выбран ни один столбец."
+            )
+
+        if not isinstance(
+            self.strategy,
+            NumberGuessingStrategy,
+        ):
+            raise ValueError(
+                "Текущая стратегия не поддерживает "
+                "прямой расчёт числа."
+            )
+
+        return self.strategy.calculate_number(
+            selected_columns
+        )
 
     def guess(
         self,
@@ -29,7 +55,9 @@ class Game:
         """Определяет объект по выбранным столбцам."""
 
         if not selected_columns:
-            raise ValueError("Не выбран ни один столбец.")
+            raise ValueError(
+                "Не выбран ни один столбец."
+            )
 
         return self.strategy.find_object(
             category,
