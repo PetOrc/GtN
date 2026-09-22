@@ -27,20 +27,11 @@ class Game:
         self,
         selected_columns: list[str],
     ) -> int:
-        """Вычисляет загаданное число."""
+        """Вычисляет номер по выбранным столбцам."""
 
         if not selected_columns:
             raise ValueError(
                 "Не выбран ни один столбец."
-            )
-
-        if not isinstance(
-            self.strategy,
-            NumberGuessingStrategy,
-        ):
-            raise ValueError(
-                "Текущая стратегия не поддерживает "
-                "прямой расчёт числа."
             )
 
         return self.strategy.calculate_number(
@@ -52,7 +43,7 @@ class Game:
         category: Category,
         selected_columns: list[str],
     ) -> dict | None:
-        """Определяет объект по выбранным столбцам."""
+        """Определяет объект выбранной категории."""
 
         if not selected_columns:
             raise ValueError(

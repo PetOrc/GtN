@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -17,6 +18,7 @@ from PySide6.QtWidgets import (
 
 from game import Game
 
+
 class ThemeToggle(QCheckBox):
     """Переключатель светлой и тёмной темы."""
 
@@ -34,9 +36,6 @@ class ThemeToggle(QCheckBox):
         if event.button() == Qt.MouseButton.LeftButton:
             self.setChecked(not self.isChecked())
             self.update()
-
-            # Не передаём событие QCheckBox,
-            # чтобы состояние не переключилось второй раз.
             event.accept()
             return
 
@@ -45,14 +44,11 @@ class ThemeToggle(QCheckBox):
     def paintEvent(self, event):
         """Отрисовывает переключатель."""
 
-        from PySide6.QtGui import QPainter, QBrush, QColor
+        from PySide6.QtGui import QBrush, QColor, QPainter
 
         painter = QPainter(self)
-        painter.setRenderHint(
-            QPainter.RenderHint.Antialiasing
-        )
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        # Фон переключателя
         if self.isChecked():
             track_color = QColor("#3b4654")
         else:
@@ -70,7 +66,6 @@ class ThemeToggle(QCheckBox):
             14,
         )
 
-        # Положение кружка
         if self.isChecked():
             circle_x = 29
             circle_color = QColor("#f4f6f8")
@@ -87,7 +82,6 @@ class ThemeToggle(QCheckBox):
             22,
         )
 
-        # Значок темы
         painter.setPen(
             QColor("#66717d")
             if not self.isChecked()
@@ -99,6 +93,7 @@ class ThemeToggle(QCheckBox):
             18,
             "☀" if not self.isChecked() else "☾",
         )
+
 
 class MainWindow(QMainWindow):
     """Главное окно игры «Угадай число»."""
@@ -115,8 +110,13 @@ class MainWindow(QMainWindow):
         self.column_checkboxes = []
         self.last_selected_columns = None
 
+        # Категория «Числа» выбрана по умолчанию.
+        self.current_category = self.game.get_category("4")
+
         self.create_interface()
         self.load_style("light.qss")
+
+        self.refresh_category_table()
 
     def create_interface(self):
         """Создаёт интерфейс главного окна."""
@@ -137,14 +137,12 @@ class MainWindow(QMainWindow):
         self.plants_button = QPushButton("Растения")
         self.animals_button = QPushButton("Животные")
         self.help_button = QPushButton("Справка")
-        
+
         self.theme_toggle = ThemeToggle()
-        self.theme_toggle.toggled.connect(
-            self.toggle_theme
-        )
+        self.theme_toggle.toggled.connect(self.toggle_theme)
 
-        self.numbers_button.setObjectName("activeCategory")
-
+        # Порядок кнопок соответствует порядку категорий:
+        # Числа → Города → Имена → Растения → Животные.
         category_buttons = [
             self.numbers_button,
             self.cities_button,
@@ -159,21 +157,36 @@ class MainWindow(QMainWindow):
                 button.sizePolicy().Policy.Expanding,
                 button.sizePolicy().Policy.Fixed,
             )
-
             category_layout.addWidget(button)
-
-        category_layout.addSpacing(15)
 
         self.help_button.setMinimumWidth(85)
         self.help_button.setMinimumHeight(34)
 
+        category_layout.addSpacing(15)
         category_layout.addWidget(self.help_button)
-
-        category_layout.addWidget(
-            self.theme_toggle
-        )
+        category_layout.addWidget(self.theme_toggle)
 
         main_layout.addLayout(category_layout)
+
+        # Подключение категорий.
+        self.numbers_button.clicked.connect(
+            lambda: self.select_category("4")
+        )
+        self.cities_button.clicked.connect(
+            lambda: self.select_category("2")
+        )
+        self.names_button.clicked.connect(
+            lambda: self.select_category("5")
+        )
+        self.plants_button.clicked.connect(
+            lambda: self.select_category("3")
+        )
+        self.animals_button.clicked.connect(
+            lambda: self.select_category("1")
+        )
+
+        # По умолчанию активна категория «Числа».
+        self.numbers_button.setObjectName("activeCategory")
 
         # =================================================
         # Таблица
@@ -185,10 +198,6 @@ class MainWindow(QMainWindow):
         table_layout = QVBoxLayout(table_frame)
         table_layout.setContentsMargins(8, 8, 8, 8)
         table_layout.setSpacing(0)
-
-        # -------------------------------------------------
-        # Чекбоксы
-        # -------------------------------------------------
 
         checkbox_layout = QGridLayout()
         checkbox_layout.setContentsMargins(0, 0, 0, 4)
@@ -216,15 +225,9 @@ class MainWindow(QMainWindow):
 
         table_layout.addLayout(checkbox_layout)
 
-        # -------------------------------------------------
-        # Таблица чисел
-        # -------------------------------------------------
-
         self.table = QTableWidget()
-
         self.table.setObjectName("numberTable")
 
-        self.table.setRowCount(17)
         self.table.setColumnCount(5)
 
         self.table.horizontalHeader().setVisible(False)
@@ -242,70 +245,11 @@ class MainWindow(QMainWindow):
             Qt.FocusPolicy.NoFocus
         )
 
-        columns = [
-            [
-                16, 17, 18, 19, 20, 20, 22, 23, 24,
-                25, 26, 27, 28, 29, 30, 31, 16
-            ],
-            [
-                8, 9, 10, 11, 12, 13, 14, 15, 24,
-                25, 26, 27, 28, 29, 30, 31, 8
-            ],
-            [
-                4, 5, 6, 7, 12, 13, 14, 15, 20,
-                21, 22, 23, 28, 29, 30, 31, 4
-            ],
-            [
-                2, 3, 6, 7, 10, 11, 14, 15, 18,
-                19, 22, 23, 26, 27, 30, 31, 2
-            ],
-            [
-                1, 3, 5, 7, 9, 11, 13, 15, 17,
-                19, 21, 23, 25, 27, 29, 31, 1
-            ],
-        ]
-
         for column in range(5):
-            for row in range(17):
-                item = QTableWidgetItem(
-                    str(columns[column][row])
-                )
-
-                item.setTextAlignment(
-                    Qt.AlignmentFlag.AlignCenter
-                )
-
-                self.table.setItem(
-                    row,
-                    column,
-                    item,
-                )
-
-        # Равномерное распределение ширины
-        self.table.horizontalHeader().setSectionResizeMode(
-            0,
-            self.table.horizontalHeader().ResizeMode.Stretch,
-        )
-
-        self.table.horizontalHeader().setSectionResizeMode(
-            1,
-            self.table.horizontalHeader().ResizeMode.Stretch,
-        )
-
-        self.table.horizontalHeader().setSectionResizeMode(
-            2,
-            self.table.horizontalHeader().ResizeMode.Stretch,
-        )
-
-        self.table.horizontalHeader().setSectionResizeMode(
-            3,
-            self.table.horizontalHeader().ResizeMode.Stretch,
-        )
-
-        self.table.horizontalHeader().setSectionResizeMode(
-            4,
-            self.table.horizontalHeader().ResizeMode.Stretch,
-        )
+            self.table.horizontalHeader().setSectionResizeMode(
+                column,
+                self.table.horizontalHeader().ResizeMode.Stretch,
+            )
 
         self.table.verticalHeader().setSectionResizeMode(
             self.table.verticalHeader().ResizeMode.Stretch
@@ -325,10 +269,6 @@ class MainWindow(QMainWindow):
         bottom_layout = QHBoxLayout()
         bottom_layout.setSpacing(12)
 
-        # -------------------------------------------------
-        # Поле результата
-        # -------------------------------------------------
-
         result_frame = QFrame()
         result_frame.setObjectName("resultFrame")
 
@@ -336,38 +276,27 @@ class MainWindow(QMainWindow):
         result_layout.setContentsMargins(10, 4, 10, 4)
 
         self.result_label = QLabel(
-            "Заданное число: —"
+            "Заданный объект: —"
         )
 
-        self.result_label.setObjectName(
-            "resultLabel"
-        )
+        self.result_label.setObjectName("resultLabel")
 
         self.result_label.setAlignment(
             Qt.AlignmentFlag.AlignCenter
         )
 
-        result_layout.addWidget(
-            self.result_label
-        )
+        result_layout.addWidget(self.result_label)
 
         bottom_layout.addWidget(
             result_frame,
             stretch=1,
         )
 
-        # -------------------------------------------------
-        # Кнопка действия
-        # -------------------------------------------------
-
         self.action_button = QPushButton(
             "Показать результат"
         )
 
-        self.action_button.setObjectName(
-            "actionButton"
-        )
-
+        self.action_button.setObjectName("actionButton")
         self.action_button.setMinimumWidth(150)
         self.action_button.setMinimumHeight(42)
 
@@ -379,9 +308,7 @@ class MainWindow(QMainWindow):
             self.action_button
         )
 
-        main_layout.addLayout(
-            bottom_layout
-        )
+        main_layout.addLayout(bottom_layout)
 
     def load_style(self, filename: str):
         """Загружает стиль интерфейса из QSS-файла."""
@@ -399,10 +326,121 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(file.read())
 
     def toggle_theme(self, dark: bool):
+        """Переключает тему интерфейса."""
+
         if dark:
             self.load_style("dark.qss")
         else:
             self.load_style("light.qss")
+
+    def select_category(self, category_id: str):
+        """Выбирает категорию игры."""
+
+        category = self.game.get_category(category_id)
+
+        if category is None:
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "Не удалось загрузить выбранную категорию.",
+            )
+            return
+
+        self.current_category = category
+
+        for checkbox in self.column_checkboxes:
+            checkbox.setChecked(False)
+
+        self.last_selected_columns = None
+
+        self.result_label.setText(
+            "Заданный объект: —"
+        )
+
+        self.action_button.setText(
+            "Показать результат"
+        )
+
+        category_button_map = {
+            "4": self.numbers_button,
+            "2": self.cities_button,
+            "5": self.names_button,
+            "3": self.plants_button,
+            "1": self.animals_button,
+        }
+
+        category_buttons = [
+            self.numbers_button,
+            self.cities_button,
+            self.names_button,
+            self.plants_button,
+            self.animals_button,
+        ]
+
+        for button in category_buttons:
+            button.setObjectName("")
+
+        active_button = category_button_map.get(category_id)
+
+        if active_button is not None:
+            active_button.setObjectName("activeCategory")
+
+        self.refresh_category_table()
+
+        # Обновляем оформление после изменения objectName.
+        for button in category_buttons:
+            button.style().unpolish(button)
+            button.style().polish(button)
+            button.update()
+
+    def refresh_category_table(self):
+        """Заполняет таблицу данными выбранной категории."""
+
+        if self.current_category is None:
+            return
+
+        objects = self.current_category.get_object_table()
+
+        column_objects = []
+
+        for column_number in range(1, 6):
+            column_id = str(column_number)
+
+            objects_in_column = [
+                obj
+                for obj in objects
+                if column_id in obj.get("columns", [])
+            ]
+
+            column_objects.append(objects_in_column)
+
+        row_count = max(
+            len(column)
+            for column in column_objects
+        )
+
+        self.table.clearContents()
+        self.table.setRowCount(row_count)
+
+        for column_index, objects_in_column in enumerate(
+            column_objects
+        ):
+            for row_index, obj in enumerate(
+                objects_in_column
+            ):
+                item = QTableWidgetItem(
+                    str(obj["number"])
+                )
+
+                item.setTextAlignment(
+                    Qt.AlignmentFlag.AlignCenter
+                )
+
+                self.table.setItem(
+                    row_index,
+                    column_index,
+                    item,
+                )
 
     def get_selected_columns(self) -> list[str]:
         """Возвращает выбранные пользователем столбцы."""
@@ -414,9 +452,7 @@ class MainWindow(QMainWindow):
             start=1,
         ):
             if checkbox.isChecked():
-                selected_columns.append(
-                    str(index)
-                )
+                selected_columns.append(str(index))
 
         return selected_columns
 
@@ -456,8 +492,9 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            number = self.game.calculate_number(
-                selected_columns
+            obj = self.game.guess(
+                self.current_category,
+                selected_columns,
             )
         except ValueError as error:
             QMessageBox.warning(
@@ -467,17 +504,23 @@ class MainWindow(QMainWindow):
             )
             return
 
+        if obj is None:
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "Не удалось определить объект.",
+            )
+            return
+
         self.result_label.setText(
-            f"Заданное число: {number}"
+            f"Заданный объект: {obj['name']}"
         )
 
         self.last_selected_columns = (
             selected_columns.copy()
         )
 
-        self.action_button.setText(
-            "Сброс"
-        )
+        self.action_button.setText("Сброс")
 
     def reset_game(self):
         """Сбрасывает результат и выбранные столбцы."""
@@ -488,7 +531,7 @@ class MainWindow(QMainWindow):
         self.last_selected_columns = None
 
         self.result_label.setText(
-            "Заданное число: —"
+            "Заданный объект: —"
         )
 
         self.action_button.setText(

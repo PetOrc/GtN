@@ -16,7 +16,7 @@ class GuessingStrategy(ABC):
 
 
 class NumberGuessingStrategy(GuessingStrategy):
-    """Стратегия определения числа по выбранным столбцам."""
+    """Стратегия определения объекта по выбранным столбцам."""
 
     COLUMN_VALUES = {
         "1": 16,
@@ -30,7 +30,7 @@ class NumberGuessingStrategy(GuessingStrategy):
         self,
         selected_columns: list[str],
     ) -> int:
-        """Вычисляет число по выбранным столбцам."""
+        """Вычисляет номер объекта по выбранным столбцам."""
 
         total = 0
 
@@ -49,7 +49,7 @@ class NumberGuessingStrategy(GuessingStrategy):
         category: Any,
         selected_columns: list[str],
     ) -> dict | None:
-        """Определяет объект по выбранным столбцам."""
+        """Определяет объект выбранной категории."""
 
         number = self.calculate_number(selected_columns)
 
