@@ -84,14 +84,6 @@ class ThemeToggle(QCheckBox):
             18,
             "☀" if not self.isChecked() else "☾",
         )
-        
-    def toggle_theme(self, dark: bool):
-        """Переключает тему интерфейса."""
-
-        if dark:
-            self.load_style("dark.qss")
-        else:
-            self.load_style("light.qss")
 
 class MainWindow(QMainWindow):
     """Главное окно игры «Угадай число»."""
@@ -108,8 +100,6 @@ class MainWindow(QMainWindow):
         self.column_checkboxes = []
         self.last_selected_columns = None
 
-        self.create_interface()
-        self.apply_styles()
         self.create_interface()
         self.load_style("light.qss")
 
@@ -394,128 +384,10 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(file.read())
 
     def toggle_theme(self, dark: bool):
-        """Переключает светлую и тёмную тему."""
-
         if dark:
-            self.apply_dark_styles()
+            self.load_style("dark.qss")
         else:
-            self.apply_styles()
-
-    def apply_dark_styles(self):
-        """Применяет тёмную тему."""
-
-        self.setStyleSheet(
-            """
-            QMainWindow {
-                background-color: #20252b;
-            }
-
-            QWidget {
-                font-family: "Segoe UI";
-                font-size: 13px;
-                color: #e6e9ed;
-            }
-
-            QPushButton {
-                background-color: #2b3138;
-                border: 1px solid #3b434d;
-                border-radius: 6px;
-                padding: 5px 12px;
-                color: #e6e9ed;
-            }
-
-            QPushButton:hover {
-                background-color: #343b44;
-            }
-
-            QPushButton:pressed {
-                background-color: #252a30;
-            }
-
-            QPushButton#activeCategory {
-                background-color: #3a424c;
-                border: 1px solid #4a5562;
-                color: #ffffff;
-                font-weight: 600;
-            }
-
-            QFrame#tableFrame {
-                background-color: #272d33;
-                border: 1px solid #3b434d;
-                border-radius: 7px;
-            }
-
-            QCheckBox#columnCheckBox {
-                spacing: 7px;
-                padding: 4px;
-                color: #dce1e6;
-            }
-
-            QCheckBox#columnCheckBox::indicator {
-                width: 15px;
-                height: 15px;
-                border: 1px solid #59636e;
-                border-radius: 3px;
-                background-color: #2b3138;
-            }
-
-            QCheckBox#columnCheckBox::indicator:hover {
-                border: 1px solid #778391;
-            }
-
-            QCheckBox#columnCheckBox::indicator:checked {
-                background-color: #59636e;
-                border: 1px solid #8995a2;
-            }
-
-            QTableWidget#numberTable {
-                background-color: #272d33;
-                border: none;
-                gridline-color: #3b424a;
-                color: #e4e7eb;
-                font-size: 13px;
-            }
-
-            QTableWidget#numberTable::item {
-                padding: 3px;
-                border: none;
-            }
-
-            QTableWidget#numberTable::item:selected {
-                background-color: #272d33;
-                color: #e4e7eb;
-            }
-
-            QFrame#resultFrame {
-                background-color: #272d33;
-                border: 1px solid #3b434d;
-                border-radius: 7px;
-            }
-
-            QLabel#resultLabel {
-                color: #dce8f2;
-                font-size: 17px;
-                font-weight: 600;
-            }
-
-            QPushButton#actionButton {
-                background-color: #3a424b;
-                border: 1px solid #4a535e;
-                border-radius: 6px;
-                color: #f0f2f4;
-                font-weight: 600;
-                padding: 7px 15px;
-            }
-
-            QPushButton#actionButton:hover {
-                background-color: #46505b;
-            }
-
-            QPushButton#actionButton:pressed {
-                background-color: #323941;
-            }
-            """
-        )
+            self.load_style("light.qss")
 
     def get_selected_columns(self) -> list[str]:
         """Возвращает выбранные пользователем столбцы."""
