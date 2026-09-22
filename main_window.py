@@ -429,7 +429,7 @@ class MainWindow(QMainWindow):
                 objects_in_column
             ):
                 item = QTableWidgetItem(
-                    str(obj["number"])
+                    str(obj["name"])
                 )
 
                 item.setTextAlignment(
