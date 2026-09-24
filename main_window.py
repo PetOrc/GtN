@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -17,13 +16,9 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
 from game import Game
 
-
 class ThemeToggle(QCheckBox):
-    """Переключатель светлой и тёмной темы."""
-
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -33,8 +28,6 @@ class ThemeToggle(QCheckBox):
         self.setChecked(False)
 
     def mouseReleaseEvent(self, event):
-        """Переключает состояние при нажатии мышью."""
-
         if event.button() == Qt.MouseButton.LeftButton:
             self.setChecked(not self.isChecked())
             self.update()
@@ -44,8 +37,6 @@ class ThemeToggle(QCheckBox):
         super().mouseReleaseEvent(event)
 
     def paintEvent(self, event):
-        """Отрисовывает переключатель."""
-
         from PySide6.QtGui import QBrush, QColor, QPainter
 
         painter = QPainter(self)
@@ -98,11 +89,10 @@ class ThemeToggle(QCheckBox):
 
 
 class HelpDialog(QDialog):
-    """Окно справки по игре."""
-
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.setObjectName("helpDialog")
         self.setWindowTitle("Справка")
         self.setMinimumSize(520, 490)
         self.resize(560, 490)
@@ -155,8 +145,6 @@ class HelpDialog(QDialog):
 
 
 class MainWindow(QMainWindow):
-    """Главное окно игры «Угадай число»."""
-
     def __init__(self):
         super().__init__()
 
@@ -168,18 +156,13 @@ class MainWindow(QMainWindow):
 
         self.column_checkboxes = []
         self.last_selected_columns = None
-
-        # Категория «Числа» выбрана по умолчанию.
         self.current_category = self.game.get_category("4")
 
         self.create_interface()
         self.load_style("light.qss")
-
         self.refresh_category_table()
 
     def create_interface(self):
-        """Создаёт интерфейс главного окна."""
-
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
@@ -200,12 +183,8 @@ class MainWindow(QMainWindow):
         self.theme_toggle = ThemeToggle()
         self.theme_toggle.toggled.connect(self.toggle_theme)
 
-        self.help_button.clicked.connect(
-            self.show_help
-        )
+        self.help_button.clicked.connect(self.show_help)
 
-        # Порядок кнопок соответствует порядку категорий:
-        # Числа → Города → Имена → Растения → Животные.
         category_buttons = [
             self.numbers_button,
             self.cities_button,
@@ -231,30 +210,15 @@ class MainWindow(QMainWindow):
 
         main_layout.addLayout(category_layout)
 
-        # Подключение категорий.
-        self.numbers_button.clicked.connect(
-            lambda: self.select_category("4")
-        )
-        self.cities_button.clicked.connect(
-            lambda: self.select_category("2")
-        )
-        self.names_button.clicked.connect(
-            lambda: self.select_category("5")
-        )
-        self.plants_button.clicked.connect(
-            lambda: self.select_category("3")
-        )
-        self.animals_button.clicked.connect(
-            lambda: self.select_category("1")
-        )
+        self.numbers_button.clicked.connect(lambda: self.select_category("4"))
+        self.cities_button.clicked.connect(lambda: self.select_category("2"))
+        self.names_button.clicked.connect(lambda: self.select_category("5"))
+        self.plants_button.clicked.connect(lambda: self.select_category("3"))
+        self.animals_button.clicked.connect(lambda: self.select_category("1"))
 
-        # По умолчанию активна категория «Числа».
         self.numbers_button.setObjectName("activeCategory")
 
-        # =================================================
         # Таблица
-        # =================================================
-
         table_frame = QFrame()
         table_frame.setObjectName("tableFrame")
 
@@ -267,15 +231,11 @@ class MainWindow(QMainWindow):
         checkbox_layout.setHorizontalSpacing(0)
 
         for column_number in range(5):
-            checkbox = QCheckBox(
-                f"Столбец {column_number + 1}"
-            )
+            checkbox = QCheckBox(f"Столбец {column_number + 1}")
 
             checkbox.setObjectName("columnCheckBox")
 
-            checkbox.stateChanged.connect(
-                self.columns_changed
-            )
+            checkbox.stateChanged.connect(self.columns_changed)
 
             checkbox_layout.addWidget(
                 checkbox,
@@ -296,17 +256,11 @@ class MainWindow(QMainWindow):
         self.table.horizontalHeader().setVisible(False)
         self.table.verticalHeader().setVisible(False)
 
-        self.table.setEditTriggers(
-            QTableWidget.EditTrigger.NoEditTriggers
-        )
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
 
-        self.table.setSelectionMode(
-            QTableWidget.SelectionMode.NoSelection
-        )
+        self.table.setSelectionMode(QTableWidget.SelectionMode.NoSelection)
 
-        self.table.setFocusPolicy(
-            Qt.FocusPolicy.NoFocus
-        )
+        self.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         for column in range(5):
             self.table.horizontalHeader().setSectionResizeMode(
@@ -314,21 +268,13 @@ class MainWindow(QMainWindow):
                 self.table.horizontalHeader().ResizeMode.Stretch,
             )
 
-        self.table.verticalHeader().setSectionResizeMode(
-            self.table.verticalHeader().ResizeMode.Stretch
-        )
+        self.table.verticalHeader().setSectionResizeMode(self.table.verticalHeader().ResizeMode.Stretch)
 
         table_layout.addWidget(self.table)
 
-        main_layout.addWidget(
-            table_frame,
-            stretch=1,
-        )
+        main_layout.addWidget(table_frame, stretch=1)
 
-        # =================================================
         # Нижняя панель
-        # =================================================
-
         bottom_layout = QHBoxLayout()
         bottom_layout.setSpacing(12)
 
@@ -338,73 +284,45 @@ class MainWindow(QMainWindow):
         result_layout = QVBoxLayout(result_frame)
         result_layout.setContentsMargins(10, 4, 10, 4)
 
-        self.result_label = QLabel(
-            "Заданный объект: —"
-        )
+        self.result_label = QLabel("Заданный объект: —")
 
         self.result_label.setObjectName("resultLabel")
 
-        self.result_label.setAlignment(
-            Qt.AlignmentFlag.AlignCenter
-        )
+        self.result_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         result_layout.addWidget(self.result_label)
 
-        bottom_layout.addWidget(
-            result_frame,
-            stretch=1,
-        )
+        bottom_layout.addWidget(result_frame, stretch=1)
 
-        self.action_button = QPushButton(
-            "Показать результат"
-        )
+        self.action_button = QPushButton("Показать результат")
 
         self.action_button.setObjectName("actionButton")
         self.action_button.setMinimumWidth(150)
         self.action_button.setMinimumHeight(42)
 
-        self.action_button.clicked.connect(
-            self.handle_action
-        )
+        self.action_button.clicked.connect(self.handle_action)
 
-        bottom_layout.addWidget(
-            self.action_button
-        )
+        bottom_layout.addWidget(self.action_button)
 
         main_layout.addLayout(bottom_layout)
 
     def show_help(self):
-        """Открывает окно справки."""
-
         dialog = HelpDialog(self)
         dialog.exec()
 
     def load_style(self, filename: str):
-        """Загружает стиль интерфейса из QSS-файла."""
+        style_path = (Path(__file__).resolve().parent / "styles" / filename)
 
-        style_path = (
-            Path(__file__).resolve().parent
-            / "styles"
-            / filename
-        )
-
-        with style_path.open(
-            "r",
-            encoding="utf-8",
-        ) as file:
+        with style_path.open("r", encoding="utf-8") as file:
             self.setStyleSheet(file.read())
 
     def toggle_theme(self, dark: bool):
-        """Переключает тему интерфейса."""
-
         if dark:
             self.load_style("dark.qss")
         else:
             self.load_style("light.qss")
 
     def select_category(self, category_id: str):
-        """Выбирает категорию игры."""
-
         category = self.game.get_category(category_id)
 
         if category is None:
@@ -422,13 +340,9 @@ class MainWindow(QMainWindow):
 
         self.last_selected_columns = None
 
-        self.result_label.setText(
-            "Заданный объект: —"
-        )
+        self.result_label.setText("Заданный объект: —")
 
-        self.action_button.setText(
-            "Показать результат"
-        )
+        self.action_button.setText("Показать результат")
 
         category_button_map = {
             "4": self.numbers_button,
@@ -456,15 +370,12 @@ class MainWindow(QMainWindow):
 
         self.refresh_category_table()
 
-        # Обновляем оформление после изменения objectName.
         for button in category_buttons:
             button.style().unpolish(button)
             button.style().polish(button)
             button.update()
 
     def refresh_category_table(self):
-        """Заполняет таблицу данными выбранной категории."""
-
         if self.current_category is None:
             return
 
@@ -483,27 +394,16 @@ class MainWindow(QMainWindow):
 
             column_objects.append(objects_in_column)
 
-        row_count = max(
-            len(column)
-            for column in column_objects
-        )
+        row_count = max(len(column) for column in column_objects)
 
         self.table.clearContents()
         self.table.setRowCount(row_count)
 
-        for column_index, objects_in_column in enumerate(
-            column_objects
-        ):
-            for row_index, obj in enumerate(
-                objects_in_column
-            ):
-                item = QTableWidgetItem(
-                    str(obj["name"])
-                )
+        for column_index, objects_in_column in enumerate(column_objects):
+            for row_index, obj in enumerate(objects_in_column):
+                item = QTableWidgetItem(str(obj["name"]))
 
-                item.setTextAlignment(
-                    Qt.AlignmentFlag.AlignCenter
-                )
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
                 self.table.setItem(
                     row_index,
@@ -512,8 +412,6 @@ class MainWindow(QMainWindow):
                 )
 
     def get_selected_columns(self) -> list[str]:
-        """Возвращает выбранные пользователем столбцы."""
-
         selected_columns = []
 
         for index, checkbox in enumerate(
@@ -526,21 +424,15 @@ class MainWindow(QMainWindow):
         return selected_columns
 
     def columns_changed(self):
-        """Обрабатывает изменение выбранных столбцов."""
-
         selected_columns = self.get_selected_columns()
 
         if self.last_selected_columns is None:
             return
 
         if selected_columns != self.last_selected_columns:
-            self.action_button.setText(
-                "Показать результат"
-            )
+            self.action_button.setText("Показать результат")
 
     def handle_action(self):
-        """Обрабатывает нажатие основной кнопки."""
-
         if self.action_button.text() == "Сброс":
             self.reset_game()
             return
@@ -548,8 +440,6 @@ class MainWindow(QMainWindow):
         self.show_result()
 
     def show_result(self):
-        """Показывает результат по выбранным столбцам."""
-
         selected_columns = self.get_selected_columns()
 
         if not selected_columns:
@@ -581,28 +471,18 @@ class MainWindow(QMainWindow):
             )
             return
 
-        self.result_label.setText(
-            f"Заданный объект: {obj['name']}"
-        )
+        self.result_label.setText(f"Заданный объект: {obj['name']}")
 
-        self.last_selected_columns = (
-            selected_columns.copy()
-        )
+        self.last_selected_columns = (selected_columns.copy())
 
         self.action_button.setText("Сброс")
 
     def reset_game(self):
-        """Сбрасывает результат и выбранные столбцы."""
-
         for checkbox in self.column_checkboxes:
             checkbox.setChecked(False)
 
         self.last_selected_columns = None
 
-        self.result_label.setText(
-            "Заданный объект: —"
-        )
+        self.result_label.setText("Заданный объект: —")
 
-        self.action_button.setText(
-            "Показать результат"
-        )
+        self.action_button.setText("Показать результат")

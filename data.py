@@ -2,7 +2,6 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-
 @dataclass
 class Category:
     identifier: str
@@ -11,20 +10,15 @@ class Category:
     objects: list[dict]
 
     def get_column_values(self) -> dict[str, int]:
-        """Возвращает значения столбцов категории."""
         return {
             str(column["id"]): int(column["value"])
             for column in self.columns
         }
 
     def get_object_table(self) -> list[dict]:
-        """Возвращает таблицу объектов категории."""
         return self.objects
 
-
 class DataRepository:
-    """Работа с данными, хранящимися в JSON-файле."""
-
     def __init__(self, file_path: str | Path | None = None):
         if file_path is None:
             file_path = (
@@ -39,7 +33,6 @@ class DataRepository:
         self.load()
 
     def load(self) -> None:
-        """Загружает категории из JSON-файла."""
         with self.file_path.open("r", encoding="utf-8") as file:
             data = json.load(file)
 
@@ -56,11 +49,9 @@ class DataRepository:
             self._categories.append(category)
 
     def get_categories(self) -> list[Category]:
-        """Возвращает список всех категорий."""
         return self._categories
 
     def get_category(self, identifier: str) -> Category | None:
-        """Возвращает категорию по её идентификатору."""
         for category in self._categories:
             if category.identifier == identifier:
                 return category

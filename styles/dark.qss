@@ -1,6 +1,4 @@
-QMainWindow {
-    background-color: #1e2329;
-}
+QMainWindow {background-color: #1e2329;}
 
 QWidget {
     font-family: "Segoe UI";
@@ -16,13 +14,9 @@ QPushButton {
     color: #e6e9ed;
 }
 
-QPushButton:hover {
-    background-color: #343c45;
-}
+QPushButton:hover {background-color: #343c45;}
 
-QPushButton:pressed {
-    background-color: #3d4650;
-}
+QPushButton:pressed {background-color: #3d4650;}
 
 QPushButton#activeCategory {
     background-color: #3a424c;
@@ -51,9 +45,7 @@ QCheckBox#columnCheckBox::indicator {
     background-color: #252b32;
 }
 
-QCheckBox#columnCheckBox::indicator:hover {
-    border: 1px solid #74808c;
-}
+QCheckBox#columnCheckBox::indicator:hover {border: 1px solid #74808c;}
 
 QCheckBox#columnCheckBox::indicator:checked {
     background-color: #59636e;
@@ -99,10 +91,10 @@ QPushButton#actionButton {
     padding: 7px 15px;
 }
 
-QPushButton#actionButton:hover {
-    background-color: #444e59;
-}
+QPushButton#actionButton:hover {background-color: #444e59;}
 
-QPushButton#actionButton:pressed {
-    background-color: #4d5864;
-}
+QPushButton#actionButton:pressed {background-color: #4d5864;}
+
+QDialog#helpDialog {background-color: #2b3038;}
+
+#helpDialog QTextBrowser { background-color: #1f232b; color: #e7ecf2; }
