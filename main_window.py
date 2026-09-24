@@ -3,6 +3,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
+    QDialog,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -12,6 +13,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QTableWidget,
     QTableWidgetItem,
+    QTextBrowser,
     QVBoxLayout,
     QWidget,
 )
@@ -95,6 +97,63 @@ class ThemeToggle(QCheckBox):
         )
 
 
+class HelpDialog(QDialog):
+    """Окно справки по игре."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Справка")
+        self.setMinimumSize(520, 490)
+        self.resize(560, 490)
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(18, 18, 18, 18)
+        layout.setSpacing(12)
+
+        title = QLabel("Игра «Угадай число»")
+        title.setObjectName("helpTitle")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title)
+
+        text_browser = QTextBrowser()
+        text_browser.setOpenExternalLinks(False)
+        text_browser.setHtml("""
+            <h3>Как играть</h3>
+            <ol>
+                <li>Выберите категорию: «Числа», «Города», «Имена»,
+                «Растения» или «Животные».</li>
+                <li>Найдите задуманный объект в таблице.</li>
+                <li>Отметьте все столбцы, в которых находится этот объект.</li>
+                <li>Нажмите кнопку «Показать результат».</li>
+                <li>Программа определит задуманный объект и покажет его
+                в нижней части окна.</li>
+            </ol>
+
+            <h3>Повторное определение</h3>
+            <p>
+                После получения результата можно изменить выбранные столбцы.
+                В этом случае кнопка снова станет
+                <b>«Показать результат»</b>.
+                Для полной очистки выбора нажмите <b>«Сброс»</b>.
+            </p>
+
+            <h3>Принцип работы</h3>
+            <p>
+                Каждый столбец имеет числовое значение:
+                <b>16, 8, 4, 2 и 1</b>.
+                Программа складывает значения отмеченных столбцов
+                и по полученному числу определяет объект.
+            </p>
+        """)
+        layout.addWidget(text_browser, stretch=1)
+
+        close_button = QPushButton("Закрыть")
+        close_button.setMinimumHeight(36)
+        close_button.clicked.connect(self.accept)
+        layout.addWidget(close_button, alignment=Qt.AlignmentFlag.AlignRight)
+
+
 class MainWindow(QMainWindow):
     """Главное окно игры «Угадай число»."""
 
@@ -140,6 +199,10 @@ class MainWindow(QMainWindow):
 
         self.theme_toggle = ThemeToggle()
         self.theme_toggle.toggled.connect(self.toggle_theme)
+
+        self.help_button.clicked.connect(
+            self.show_help
+        )
 
         # Порядок кнопок соответствует порядку категорий:
         # Числа → Города → Имена → Растения → Животные.
@@ -309,6 +372,12 @@ class MainWindow(QMainWindow):
         )
 
         main_layout.addLayout(bottom_layout)
+
+    def show_help(self):
+        """Открывает окно справки."""
+
+        dialog = HelpDialog(self)
+        dialog.exec()
 
     def load_style(self, filename: str):
         """Загружает стиль интерфейса из QSS-файла."""
